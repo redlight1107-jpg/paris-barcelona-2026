@@ -174,7 +174,7 @@ a{color:inherit}
   background:rgba(255,255,255,.94);-webkit-backdrop-filter:saturate(180%) blur(16px);backdrop-filter:saturate(180%) blur(16px);
   border-top:1px solid #e2ded5}
 .tab{display:flex;flex-direction:column;align-items:center;gap:2px;min-height:50px;justify-content:center;
-  border:0;background:none;color:#9aa1ab;font-size:9.5px;font-weight:700;letter-spacing:-.02em;padding:4px 0;border-radius:11px}
+  border:0;background:none;color:#9aa1ab;font-size:9px;white-space:nowrap;letter-spacing:-.04em;font-weight:700;letter-spacing:-.02em;padding:4px 0;border-radius:11px}
 .tab .ic{font-size:18px;line-height:1;filter:grayscale(1) opacity(.55);transition:.15s}
 .tab.on{color:#16233a}
 .tab.on .ic{filter:none;transform:translateY(-1px)}
@@ -247,7 +247,7 @@ a{color:inherit}
     <button class="tab on" data-tab="itin"><span class="ic">📅</span>일정</button>
     <button class="tab" data-tab="place"><span class="ic">📍</span>장소</button>
     <button class="tab" data-tab="shop"><span class="ic">🛍️</span>쇼핑</button>
-    <button class="tab" data-tab="book"><span class="ic">🎫</span>예약</button>
+    <button class="tab" data-tab="book"><span class="ic">🎫</span>예약·교통</button>
     <button class="tab" data-tab="prep"><span class="ic">✅</span>준비</button>
   </nav>
 </div>
@@ -344,8 +344,10 @@ function renderChips(){
 }
 function renderDay(){
   var ds = days(), d = ds[S.day] || ds[0], h = "";
+  var cname = d.c==="paris"?"파리":d.c==="bcn"?"바르셀로나":"이동";
+  var showTag = d.title.indexOf(cname) < 0;
   h += '<div class="dayhead c-' + d.c + '"><div class="dhc"><span class="dh-t">' + esc(d.md) + ' ' + esc(d.dw)
-     + '</span><span class="dh-d">' + (d.c==="paris"?"파리":d.c==="bcn"?"바르셀로나":d.c==="move"?"이동":"") + '</span></div>';
+     + '</span>' + (showTag ? '<span class="dh-d">' + cname + '</span>' : '') + '</div>';
   h += '<div class="dh-th">' + esc(d.title) + '</div>';
   if(d.sub) h += '<div><span class="dh-sub">' + esc(d.sub) + '</span></div>';
   h += '</div><ol class="tl">';
