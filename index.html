@@ -381,10 +381,11 @@ function mapLink(p){
   return MAPS + encodeURIComponent(p.name + (p.city ? " " + p.city : ""));
 }
 function renderPlaces(){
-  var cities = ["전체","파리","바르셀로나"], h = "";
+  var cities = ["두 도시","파리","바르셀로나"], h = "";
   h += '<div class="fcity">';
   for(var c=0;c<cities.length;c++){
-    h += '<button class="fc' + (S.pcity===cities[c]?" on":"") + '" data-pcity="' + cities[c] + '">' + cities[c] + '</button>';
+    var cl = cities[c] === "두 도시" ? "전체" : cities[c];
+    h += '<button class="fc' + (S.pcity===cities[c]?" on":"") + '" data-pcity="' + cities[c] + '">' + cl + '</button>';
   }
   h += '</div><div class="fbar">';
   var cats = ["전체"].concat(CATS);
