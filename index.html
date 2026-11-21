@@ -57,8 +57,8 @@ a{color:inherit}
 .dh-th{font-size:13.5px;color:#565d6a;margin-top:7px;font-weight:700}
 .dh-sub{display:inline-block;margin-top:7px;font-size:11.5px;color:#3d4757;background:#eae8e1;border-radius:9px;padding:4px 9px;font-weight:700}
 .tl{list-style:none;margin:12px 0 0;padding:0 16px 6px}
-.it{display:grid;grid-template-columns:44px 16px 1fr;align-items:start}
-.tm{font-size:12px;color:#989ea8;font-weight:700;text-align:right;padding:16px 6px 0 0;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.it{display:grid;grid-template-columns:50px 16px 1fr;align-items:start}
+.tm{font-size:11.5px;color:#989ea8;font-weight:700;text-align:right;padding:16px 5px 0 0;font-variant-numeric:tabular-nums;letter-spacing:-.02em;white-space:nowrap}
 .rail{position:relative;align-self:stretch;min-height:52px}
 .rail::before{content:"";position:absolute;left:7px;top:0;bottom:0;width:1px;background:#dedbd2}
 .it:first-child .rail::before{top:20px}
@@ -96,7 +96,7 @@ a{color:inherit}
 .ghead .cd{font-size:10.5px;font-weight:800;color:#fff;background:#1f3b63;padding:2px 7px;border-radius:6px}
 .ghead .cd.b{background:#b4553c}
 .ghead .cd.g{background:#5d6b62}
-.ghead span{margin-left:auto;font-size:11px;color:#939aa4;font-variant-numeric:tabular-nums}
+.ghead>span:last-child{margin-left:auto;font-size:11px;color:#939aa4;font-variant-numeric:tabular-nums}
 .item{display:flex;gap:10px;align-items:flex-start;padding:11px 12px;background:#fff;border:1px solid #e5e2da;border-radius:12px;margin:0 16px 7px}
 .cb{position:relative;flex:0 0 auto;width:24px;height:24px;margin-top:1px;border-radius:7px;border:1.7px solid #cbc7be;background:#fff;
   display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;line-height:1;padding:0;transition:.12s}
@@ -307,10 +307,13 @@ function dday(){
 
 /* ---------------- 일정 ---------------- */
 function days(){ return S.track === "r22" ? D.days.r22 : D.days.r21; }
-function badge(r){
+function badge(r, s){
   if(!r) return "";
   if(r.indexOf("☑") >= 0) return '<span class="bd ok">예약완료</span>';
-  if(r.indexOf("☐") >= 0) return '<span class="bd need">예약필요</span>';
+  if(r.indexOf("☐") >= 0){
+    if(s && s.indexOf("예약 완료") >= 0) return '<span class="bd ok">예약완료</span>';
+    return '<span class="bd need">예약필요</span>';
+  }
   return "";
 }
 function dotOf(r){
@@ -322,7 +325,7 @@ function dotOf(r){
 function itemHTML(it){
   var h = '<li class="it"><div class="tm">' + esc(it.t) + '</div>';
   h += '<div class="rail"><span class="dot ' + dotOf(it.r) + '"></span></div><div class="card">';
-  h += '<div class="chd"><div class="tt">' + (it.e ? '<span class="em">' + esc(it.e) + '</span>' : '') + esc(it.n) + '</div>' + badge(it.r) + '</div>';
+  h += '<div class="chd"><div class="tt">' + (it.e ? '<span class="em">' + esc(it.e) + '</span>' : '') + esc(it.n) + '</div>' + badge(it.r, it.s) + '</div>';
   if(it.s) h += '<div class="mt">' + esc(it.s) + '</div>';
   if(it.x) h += '<div class="xr">↔ ' + esc(it.x) + '</div>';
   if(it.o) h += '<div class="nt">' + esc(it.o) + '</div>';
@@ -401,7 +404,7 @@ function renderPlaces(){
     if(p.rec) out += '<div class="pcr">' + esc(p.rec) + '</div>';
     var facts = [];
     if(p.price) facts.push('<span class="tiny b">' + esc(p.price) + '</span>');
-    if(p.book) facts.push('<span class="tiny a">예약 ' + esc(p.book) + '</span>');
+    if(p.book) facts.push('<span class="tiny a">' + esc(p.book) + '</span>');
     if(p.hours) facts.push('<span class="tiny">' + esc(p.hours) + '</span>');
     if(facts.length) out += '<div class="pcf">' + facts.join("") + '</div>';
     if(p.memo) out += '<div class="pcm">' + esc(p.memo) + '</div>';
@@ -419,7 +422,7 @@ function shopRow(it, idx){
   var key = "s" + idx, on = !!S.shop[key];
   var sub = [];
   if(it.brand) sub.push(esc(it.brand));
-  if(it.where) sub.push(esc(it.where));
+  if(it.where && it.where !== it.brand) sub.push(esc(it.where));
   var price = [it.eur, it.krw].filter(function(x){ return !!x; }).join(" · ");
   var h = '<div class="item' + (on?" done":"") + '">';
   h += '<button class="cb' + (on?" on":"") + '" data-t="shop" data-k="' + key + '" aria-label="체크">✓</button>';
@@ -503,7 +506,7 @@ function renderPrep(){
       if(/^https?:/.test(x.link)) inner += '<a class="lk" href="' + esc(x.link) + '" target="_blank" rel="noopener">참고</a>';
       inner += '</div>';
     }
-    h += '<details class="sec"><summary><span class="ic">·</span>' + esc(order[i]) + '<span class="cnt">' + list.length + '</span><span class="chev">▶</span></summary><div class="secbody">' + inner + '</div></details>';
+    h += '<details class="sec"><summary>' + esc(order[i]) + '<span class="cnt">' + list.length + '</span><span class="chev">▶</span></summary><div class="secbody">' + inner + '</div></details>';
   }
   el("prepList").innerHTML = h;
   el("prepCount").textContent = done + " / " + total;
@@ -569,7 +572,8 @@ function renderBook(){
     if(p.pre) l4.push("사전 " + esc(p.pre));
     if(p.onsite) l4.push("현장 " + esc(p.onsite));
     if(l4.length) h += '<div class="rs">' + l4.join(" · ") + '</div>';
-    if(p.memo) h += '<div class="rn">' + esc(p.memo) + '</div>';
+    if(p.memo && /^https?:/.test(p.memo)) h += '<a class="lk" href="' + esc(p.memo) + '" target="_blank" rel="noopener">공연 정보</a>';
+    else if(p.memo) h += '<div class="rn">' + esc(p.memo) + '</div>';
     if(/^https?:/.test(p.link)) h += '<a class="lk" href="' + esc(p.link) + '" target="_blank" rel="noopener">참고</a>';
     h += '</div>';
   }
